@@ -1,3 +1,11 @@
+use problems::*;
+
+mod advent_of_code;
+
+mod problems {
+    automod::dir!(pub "src/problems");
+}
+
 fn main() {
-    println!("Hello, world!");
+    day01::run();
 }
