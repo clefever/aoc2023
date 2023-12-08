@@ -7,5 +7,5 @@ mod problems {
 }
 
 fn main() {
-    day07::run();
+    day08::run();
 }
