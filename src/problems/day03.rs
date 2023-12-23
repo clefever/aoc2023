@@ -3,31 +3,24 @@ use crate::advent_of_code;
 #[allow(dead_code)]
 pub fn run() {
     let input = advent_of_code::read_input_lines(3);
-    advent_of_code::answer(1, Some(538046), part1(&input));
-    advent_of_code::answer(2, Some(81709807), part2(&input));
+    let (part_numbers, symbols) = parse_schematic(&input);
+    advent_of_code::answer(1, Some(538046), part1(&part_numbers, &symbols));
+    advent_of_code::answer(2, Some(81709807), part2(&part_numbers, &symbols));
 }
 
-fn part1(input: &[String]) -> i32 {
-    let mut sum = 0;
-
-    let (part_numbers, symbols) = parse_schematic(input);
-    for part_number in part_numbers {
+fn part1(part_numbers: &Vec<PartNumber>, symbols: &Vec<Symbol>) -> i32 {
+    part_numbers.iter().filter(|part_number| {
         let min_x = part_number.position.0 - 1;
         let min_y = part_number.position.1 - 1;
         let max_x = part_number.position.0 + part_number.length;
         let max_y = part_number.position.1 + 1;
-        if symbols.iter().any(|symbol| symbol.position.0 >= min_x && symbol.position.0 <= max_x && symbol.position.1 >= min_y && symbol.position.1 <= max_y) {
-            sum += part_number.value;
-        }
-    }
-
-    sum
+        symbols.iter().any(|symbol| symbol.position.0 >= min_x && symbol.position.0 <= max_x && symbol.position.1 >= min_y && symbol.position.1 <= max_y)
+    }).map(|part_number| part_number.value).sum()
 }
 
-fn part2(input: &[String]) -> i32 {
+fn part2(part_numbers: &Vec<PartNumber>, symbols: &Vec<Symbol>) -> i32 {
     let mut sum = 0;
 
-    let (part_numbers, symbols) = parse_schematic(input);
     for symbol in symbols.iter().filter(|symbol| symbol.value == '*') {
         let min_x = symbol.position.0 - 1;
         let min_y = symbol.position.1 - 1;
@@ -50,7 +43,7 @@ fn parse_schematic(input: &[String]) -> (Vec<PartNumber>, Vec<Symbol>) {
     for y in 0..input.len() {
         let mut row = input[y].chars();
         for x in 0..input[y].len() {
-            let item = row.nth(0).unwrap();
+            let item = row.next().unwrap();
             if item.is_digit(10) {
                 builder.push(item);
             } else {
@@ -76,14 +69,12 @@ fn parse_schematic(input: &[String]) -> (Vec<PartNumber>, Vec<Symbol>) {
     (numbers, symbols)
 }
 
-#[derive(Debug)]
 struct PartNumber {
     value: i32,
     position: (i32, i32),
     length: i32,
 }
 
-#[derive(Debug)]
 struct Symbol {
     value: char,
     position: (i32, i32),
